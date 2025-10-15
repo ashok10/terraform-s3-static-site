@@ -1,0 +1,46 @@
+name: Terraform CI/CD S3
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
+      TF_VAR_aws_region: ${{ secrets.AWS_REGION || 'eu-north-1' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Select or Create Workspace
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF##*/}")
+          terraform workspace select "$BRANCH_NAME" || terraform workspace new "$BRANCH_NAME"
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply (only on master)
+        if: github.ref == 'refs/heads/master'
+        run: terraform apply -auto-approve tfplan
+
+      - name: Terraform Apply (on other branches)
+        if: github.ref != 'refs/heads/master'
+        run: terraform apply -auto-approve tfplan
