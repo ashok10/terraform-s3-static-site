@@ -5,4 +5,6 @@ variable "aws_region" {
 variable "bucket_name" {
   description = "Base name of the S3 bucket (workspace name is appended)"
   type        = string
+  default     = "my-static-site-bucket"
 }
+
