@@ -44,6 +44,6 @@ resource "aws_s3_object" "index" {
   bucket = aws_s3_bucket.static_site.id
   key    = "index.html"
   source = "${path.module}/index.html"
-  acl    = "public-read"
   content_type = "text/html"
+ 
 }
