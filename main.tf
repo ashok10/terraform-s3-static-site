@@ -2,9 +2,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_s3_bucket_website_configuration" "static_site" {
+resource "aws_s3_bucket" "static_site" {
   bucket = "${var.bucket_name}-${terraform.workspace}"
-  force_destroy = true
+
 
   website {
     index_document = "index.html"
@@ -12,7 +12,7 @@ resource "aws_s3_bucket_website_configuration" "static_site" {
   }
 
   tags = {
-    Name        = "StaticWebsite"
+    Name        = "${var.bucket_name}-${terraform.workspace}"
     Environment = terraform.workspace
   }
 }
