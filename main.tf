@@ -2,7 +2,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_s3_bucket" "static_site" {
+resource "aws_s3_bucket_website_configuration" "static_site" {
   bucket = "${var.bucket_name}-${terraform.workspace}"
   force_destroy = true
 
